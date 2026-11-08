@@ -1,0 +1,890 @@
+/* Painel Econômico: an editorial "economic bulletin" look. Warm paper and
+   ink in light mode, charcoal in dark mode. Every color is a token below;
+   series colors were checked for color-vision deficiency and contrast. */
+
+:root {
+  color-scheme: light dark;
+
+  --bg: #f5f1e8;
+  --surface: #fffcf5;
+  --surface-2: #f0eadc;
+  --ink: #1c1a15;
+  --ink-2: #57524a;
+  --muted: #6b6458;
+  --rule: #d9d0bd;
+  --grid: #ebe4d6;
+  --axis: #b8ad97;
+  --brand: #14532d;
+  --brand-ink: #fffcf5;
+  --focus: #1f5fbf;
+  --series-a: #1f5fbf;
+  --series-b: #c8462c;
+  --warn-bg: #fbefd2;
+  --warn-rule: #c9962b;
+  --error-bg: #fbe5df;
+  --error-rule: #c0563f;
+  --shadow: 0 1px 0 rgb(28 26 21 / 0.04), 0 10px 30px -18px rgb(28 26 21 / 0.35);
+
+  --font-display: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
+  --font-sans: 'IBM Plex Sans Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --radius: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #171612;
+    --surface: #1f1d18;
+    --surface-2: #29261f;
+    --ink: #f1ece1;
+    --ink-2: #c4bdae;
+    --muted: #a39c8c;
+    --rule: #3a362d;
+    --grid: #2e2b24;
+    --axis: #5a5447;
+    --brand: #86c79a;
+    --brand-ink: #10200f;
+    --focus: #8ab4ff;
+    --series-a: #4f8de6;
+    --series-b: #e06c40;
+    --warn-bg: #33290f;
+    --warn-rule: #a07c25;
+    --error-bg: #3a1c15;
+    --error-rule: #b4543d;
+    --shadow: 0 1px 0 rgb(0 0 0 / 0.3), 0 10px 30px -18px rgb(0 0 0 / 0.8);
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 1rem/1.55 var(--font-sans);
+  font-optical-sizing: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration-color: var(--axis);
+  text-underline-offset: 0.18em;
+}
+
+a:hover {
+  text-decoration-color: currentColor;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+h1,
+h2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  left: 16px;
+  top: -100px;
+  z-index: 10;
+  padding: 0.5rem 1rem;
+  background: var(--ink);
+  color: var(--bg);
+  border-radius: 6px;
+}
+
+.skip-link:focus {
+  top: 12px;
+}
+
+.page {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 16px 48px;
+}
+
+/* ---------- Masthead ---------- */
+
+.masthead {
+  padding: 24px 0 20px;
+  border-bottom: 4px double var(--ink);
+  margin-bottom: 24px;
+}
+
+.masthead h1 {
+  font-size: clamp(2.4rem, 7vw, 4.25rem);
+}
+
+/* On wide screens the lede sits beside the title to save height. */
+@media (min-width: 1100px) {
+  .masthead {
+    display: grid;
+    grid-template-columns: auto minmax(0, 30rem);
+    align-items: end;
+    justify-content: space-between;
+    column-gap: 48px;
+  }
+
+  .kicker {
+    grid-column: 1 / -1;
+  }
+
+  .masthead h1 {
+    font-size: 3.6rem;
+  }
+
+  .masthead .lede {
+    margin: 0 0 6px;
+  }
+}
+
+.kicker {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 16px;
+  margin: 0 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+
+.edition {
+  color: var(--muted);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+.lede {
+  max-width: 44rem;
+  margin: 12px 0 0;
+  font-size: clamp(1.02rem, 2.2vw, 1.2rem);
+  color: var(--ink-2);
+}
+
+/* ---------- Section heads ---------- */
+
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 16px;
+  margin-bottom: 12px;
+}
+
+.section-head h2 {
+  font-size: 1.35rem;
+}
+
+.section-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* ---------- Layout: cards beside the chart on wide screens ---------- */
+
+.layout {
+  display: grid;
+  gap: 32px;
+}
+
+@media (min-width: 1100px) {
+  .layout {
+    grid-template-columns: 15.5rem minmax(0, 1fr);
+    align-items: start;
+    gap: 28px;
+  }
+}
+
+/* ---------- Latest values ---------- */
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 720px) {
+  .cards {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  height: 100%;
+  min-height: 7.5rem;
+  padding: 14px 14px 12px;
+  border: 1px solid var(--rule);
+  border-top: 4px solid var(--rule);
+  border-radius: 4px 4px var(--radius) var(--radius);
+  background: var(--surface);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    transform 0.15s,
+    box-shadow 0.15s;
+}
+
+.card:hover {
+  border-color: var(--axis);
+  box-shadow: var(--shadow);
+}
+
+.card[data-role='a'] {
+  border-top-color: var(--series-a);
+  box-shadow: var(--shadow);
+}
+
+.card[data-role='b'] {
+  border-top-color: var(--series-b);
+}
+
+.card[aria-pressed='true'] {
+  border-color: var(--ink);
+  border-top-color: var(--series-a);
+}
+
+.card-name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.card-value {
+  font-family: var(--font-display);
+  font-size: clamp(1.55rem, 4.5vw, 1.9rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-variant-numeric: lining-nums;
+}
+
+.card-value small {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--ink-2);
+}
+
+.card-meta,
+.card-change {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.card-change {
+  margin-top: auto;
+  padding-top: 6px;
+  color: var(--ink-2);
+}
+
+/* In the sidebar the cards stack and put the date beside the name. */
+@media (min-width: 1100px) {
+  .cards {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .card {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'name meta'
+      'value value'
+      'change change';
+    align-items: baseline;
+    min-height: 0;
+    padding: 10px 14px;
+  }
+
+  .card-name {
+    grid-area: name;
+  }
+
+  .card-value {
+    grid-area: value;
+  }
+
+  .card-meta {
+    grid-area: meta;
+  }
+
+  .card-change {
+    grid-area: change;
+    padding-top: 2px;
+  }
+}
+
+/* ---------- Explorer: controls + chart ---------- */
+
+.explorer {
+  scroll-margin-top: 16px;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 14px 16px;
+  margin-bottom: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.field > label,
+.field > legend {
+  padding: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+/* A legend is not a flex item, so it does not get the gap; add it back. */
+.field > legend {
+  margin-bottom: 4px;
+}
+
+.controls > .field:not(.period) {
+  flex: 1 1 13rem;
+}
+
+select,
+input[type='date'] {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--axis);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.95rem;
+}
+
+select {
+  width: 100%;
+}
+
+input[aria-invalid='true'] {
+  border-color: var(--error-rule);
+}
+
+.period {
+  flex: 1 1 22rem;
+}
+
+.segmented {
+  display: flex;
+  border: 1px solid var(--axis);
+  border-radius: 8px;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.segment {
+  position: relative;
+  flex: 1 1 auto;
+}
+
+.segment + .segment {
+  border-left: 1px solid var(--axis);
+}
+
+.segment input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.segment span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.segment input:hover + span {
+  background: var(--surface-2);
+}
+
+.segment input:checked + span {
+  background: var(--ink);
+  color: var(--bg);
+  font-weight: 600;
+}
+
+.segment input:focus-visible + span {
+  outline: 3px solid var(--focus);
+  outline-offset: -3px;
+}
+
+.custom-range {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  flex: 1 1 100%;
+}
+
+.custom-range .field {
+  flex: 1 1 10rem;
+}
+
+/* Always rendered (empty when valid) so screen readers track the alert. */
+.field-error {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+
+/* Next to the sidebar, the controls fit in one row above the chart. */
+@media (min-width: 1100px) {
+  .controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  }
+
+  .custom-range {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ---------- Chart panel ---------- */
+
+.panel {
+  padding: 18px 16px 16px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+@media (min-width: 720px) {
+  .panel {
+    padding: 22px 24px 18px;
+  }
+}
+
+.panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px 24px;
+  margin-bottom: 12px;
+}
+
+.panel-head h2 {
+  font-size: clamp(1.4rem, 3.4vw, 1.9rem);
+}
+
+.panel-sub {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.panel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--axis);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.button:hover {
+  background: var(--surface-2);
+}
+
+.button-primary {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: var(--brand-ink);
+}
+
+.button-primary:hover {
+  background: var(--brand);
+  filter: brightness(1.1);
+}
+
+/* The table toggle shows a check box that fills when pressed. */
+.check {
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid currentColor;
+  border-radius: 3px;
+}
+
+.button[aria-pressed='true'] .check {
+  background: currentColor;
+  box-shadow: inset 0 0 0 2px var(--surface);
+}
+
+.copy-status {
+  font-size: 0.85rem;
+  color: var(--ink-2);
+}
+
+.notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border-left: 4px solid;
+  border-radius: 6px;
+  font-size: 0.92rem;
+}
+
+.notice p {
+  margin: 0;
+}
+
+.notice-warn {
+  border-color: var(--warn-rule);
+  background: var(--warn-bg);
+}
+
+.notice-error {
+  border-color: var(--error-rule);
+  background: var(--error-bg);
+}
+
+.placeholder {
+  display: grid;
+  place-items: center;
+  min-height: 300px;
+  margin: 0;
+  color: var(--muted);
+  text-align: center;
+}
+
+.figure {
+  margin: 0;
+  transition: opacity 0.2s;
+}
+
+/* While new data loads, the previous chart stays in place, dimmed. */
+.figure.is-loading {
+  opacity: 0.5;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  margin: 0 0 6px;
+  padding: 0;
+  list-style: none;
+  font-size: 0.88rem;
+}
+
+.legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.unit {
+  color: var(--muted);
+}
+
+.line-key {
+  flex: none;
+  overflow: visible;
+}
+
+/* ---------- SVG chart ---------- */
+
+.chart {
+  position: relative;
+  min-height: 300px;
+}
+
+.chart-focus {
+  position: relative;
+  border-radius: 8px;
+}
+
+.chart svg {
+  display: block;
+  overflow: visible;
+  font-family: var(--font-sans);
+}
+
+.chart-unit {
+  font-size: 12px;
+  font-weight: 600;
+  fill: var(--ink-2);
+}
+
+.chart-tick {
+  font-size: 11.5px;
+  fill: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-grid {
+  stroke: var(--grid);
+  stroke-width: 1;
+}
+
+.chart-baseline {
+  stroke: var(--axis);
+  stroke-width: 1;
+}
+
+.chart-zero {
+  stroke: var(--muted);
+  stroke-width: 1;
+}
+
+.chart-line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.chart-line-a {
+  stroke: var(--series-a);
+}
+
+/* The second series is also dashed, so the two never rely on color alone. */
+.chart-line-b {
+  stroke: var(--series-b);
+  stroke-dasharray: 6 4;
+}
+
+.chart-dot {
+  stroke: var(--surface);
+  stroke-width: 2;
+}
+
+.chart-dot-a {
+  fill: var(--series-a);
+}
+
+.chart-dot-b {
+  fill: var(--series-b);
+}
+
+.chart-crosshair {
+  stroke: var(--ink-2);
+  stroke-width: 1;
+}
+
+.chart-hit {
+  fill: transparent;
+  cursor: crosshair;
+  touch-action: pan-y;
+}
+
+.chart-tooltip {
+  position: absolute;
+  top: 6px;
+  z-index: 1;
+  min-width: 10rem;
+  padding: 8px 10px;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  font-size: 0.85rem;
+  pointer-events: none;
+  transform: translateX(12px);
+}
+
+.chart-tooltip-left {
+  transform: translateX(calc(-100% - 12px));
+}
+
+.chart-tooltip-date {
+  margin-bottom: 4px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.chart-tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.chart-tooltip-row strong {
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-tooltip-row span {
+  color: var(--muted);
+}
+
+.chart-hint {
+  margin: 8px 0 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* ---------- Table ---------- */
+
+.table-scroll {
+  max-height: 28rem;
+  overflow: auto;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.data-table caption {
+  padding: 10px 12px;
+  text-align: left;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.data-table th,
+.data-table td {
+  padding: 7px 12px;
+  border-top: 1px solid var(--grid);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.data-table th:first-child {
+  text-align: left;
+  font-weight: 500;
+}
+
+.data-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-2);
+  font-weight: 600;
+}
+
+.data-table tbody tr:hover {
+  background: var(--surface-2);
+}
+
+/* ---------- Sources and footer ---------- */
+
+.sources {
+  display: grid;
+  gap: 4px;
+  margin: 14px 0 0;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--grid);
+  list-style: none;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.sources strong {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+.footer {
+  margin-top: 40px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.footer p {
+  margin: 0 0 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}

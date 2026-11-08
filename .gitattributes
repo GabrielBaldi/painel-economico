@@ -1,0 +1,3 @@
+# Keep LF line endings in the repository, also when cloned on Windows.
+* text=auto eol=lf
+*.png binary

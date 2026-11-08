@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: Lint, test and build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # Front-end first: the Go binary embeds web/dist.
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install front-end dependencies
+        working-directory: web
+        run: npm ci
+      - name: Check formatting (Prettier)
+        working-directory: web
+        run: npm run format:check
+      - name: Lint (ESLint)
+        working-directory: web
+        run: npm run lint
+      - name: Test (Vitest)
+        working-directory: web
+        run: npm test
+      - name: Type-check and build
+        working-directory: web
+        run: npm run build
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+      - name: Check formatting (gofmt)
+        run: |
+          unformatted=$(gofmt -l cmd internal web/embed.go)
+          if [ -n "$unformatted" ]; then echo "Run gofmt on:"; echo "$unformatted"; exit 1; fi
+      - name: Vet
+        run: go vet ./...
+      - name: Staticcheck
+        run: go run honnef.co/go/tools/cmd/staticcheck@v0.8.2 ./...
+      - name: Test with the race detector
+        run: go test -race ./...
+      - name: Build the single binary
+        run: go build -o bin/painel-economico ./cmd/server
